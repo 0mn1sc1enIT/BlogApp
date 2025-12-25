@@ -1,0 +1,112 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row tm-row tm-mb-60">
+    <div class="col-12">
+        <h2 class="tm-color-primary tm-post-title tm-mb-60">My Profile</h2>
+    </div>
+    
+    <div class="col-lg-6 tm-mb-60">
+        <div class="tm-bg-gray tm-about-pad h-100 text-center">
+
+            <div class="mb-4">
+                {% if user.avatar %}
+                    <img src="data:image/jpeg;base64,{{ user.avatar }}" alt="Avatar" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                    <i class="fas fa-user-circle fa-7x tm-color-primary"></i>
+                {% endif %}
+            </div>
+
+            <form action="{{ url_for('update_avatar') }}" method="POST" enctype="multipart/form-data" class="mb-4">
+                <div class="form-group">
+                    <input type="file" name="avatar" class="form-control-file" accept="image/*" required>
+                </div>
+                <button class="tm-btn tm-btn-primary tm-btn-small" style="padding: 5px 20px;">Upload New Photo</button>
+            </form>
+
+            <h3 class="mb-3 tm-color-primary">{{ user.username }}</h3>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Total Posts:</strong> {{ user.posts|length }}</p>
+            
+            <hr>
+            <form action="{{ url_for('delete_account') }}" method="POST" class="mt-4">
+                <button class="btn btn-danger" onclick="return confirm('WARNING: This will delete your account and ALL your posts permanently. Are you sure?')">
+                    <i class="fas fa-trash-alt"></i> Delete My Account
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-6 tm-mb-60">
+        <div class="tm-bg-gray tm-about-pad h-100">
+            <h3 class="mb-3 tm-color-primary">Change Password</h3>
+            <form action="{{ url_for('change_password') }}" method="POST">
+                
+                <!-- Старый пароль -->
+                <div class="form-group mb-4">
+                    <label class="mb-1">Current Password</label>
+                    <input type="password" name="current_password" class="form-control" placeholder="Enter current password" required>
+                </div>
+                
+                <!-- Новый пароль -->
+                <div class="form-group mb-4">
+                    <label class="mb-1">New Password</label>
+                    <input type="password" name="new_password" class="form-control" placeholder="Enter new password" required>
+                </div>
+
+                <!-- Подтверждение -->
+                <div class="form-group mb-4">
+                    <label class="mb-1">Confirm New Password</label>
+                    <input type="password" name="confirm_password" class="form-control" placeholder="Repeat new password" required>
+                </div>
+                
+                <button class="tm-btn tm-btn-primary tm-btn-small">Update Password</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row tm-row">
+    <div class="col-12">
+        <hr class="tm-hr-primary tm-mb-55">
+        <h2 class="tm-color-primary tm-post-title tm-mb-40">My Published Posts</h2>
+    </div>
+
+    {% if user.posts %}
+        {% for post in user.posts %}
+        <article class="col-12 col-md-6 tm-post">
+            <hr class="tm-hr-primary">
+            <a href="{{ url_for('post_detail', post_id=post.id) }}" class="effect-lily tm-post-link tm-pt-20">
+                <div class="tm-post-link-inner">
+                    {% if post.image %}
+                        <img src="data:image/jpeg;base64,{{ post.image }}" alt="Image" class="img-fluid" style="width:100%; height: 240px; object-fit: cover;">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='img/img-0' ~ (loop.index % 5 + 1) ~ '.jpg') }}" alt="Image" class="img-fluid">
+                    {% endif %}
+                </div>
+                <h2 class="tm-pt-30 tm-color-primary tm-post-title">{{ post.title }}</h2>
+            </a>
+            <p class="tm-pt-30">
+                {{ post.content[:100] }}...
+            </p>
+            <div class="d-flex justify-content-between tm-pt-45">
+                <span class="tm-color-primary">{{ post.created_at[:10] }}</span>
+                
+                <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                    <button class="tm-btn tm-btn-primary tm-btn-small" style="font-size: 0.8rem; padding: 5px 15px;" onclick="return confirm('Delete this post?')">
+                        Delete
+                    </button>
+                </form>
+            </div>
+            <hr>
+        </article>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                You haven't published any posts yet. <a href="{{ url_for('create_post') }}">Create one now!</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

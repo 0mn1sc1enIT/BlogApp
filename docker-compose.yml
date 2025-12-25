@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+
+  api:
+    build: ./api
+    restart: on-failure
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: db
+
+  frontend:
+    build: ./frontend
+    restart: always
+    depends_on:
+      - api
+    ports:
+      - "5001:5001"
+    env_file:
+      - .env
+    environment:
+      API_URL: http://api:5000
+
+volumes:
+  postgres_data:

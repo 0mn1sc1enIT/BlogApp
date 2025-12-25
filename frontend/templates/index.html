@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row tm-row">
+    <div class="col-12">
+        <form method="GET" class="form-inline tm-mb-80 tm-search-form">                
+            <input class="form-control tm-search-input" name="query" type="text" placeholder="Search..." aria-label="Search">
+            <button class="tm-search-button" type="submit">
+                <i class="fas fa-search tm-search-icon" aria-hidden="true"></i>
+            </button>                                
+        </form>
+    </div>                
+</div>            
+<div class="row tm-row">
+    {% for post in posts %}
+    <article class="col-12 col-md-6 tm-post">
+        <hr class="tm-hr-primary">
+        <a href="{{ url_for('post_detail', post_id=post.id) }}" class="effect-lily tm-post-link tm-pt-60">
+            <div class="tm-post-link-inner">
+                {% if post.image %}
+                    <img src="data:image/jpeg;base64,{{ post.image }}" alt="Image" class="img-fluid" style="width:100%; height: 240px; object-fit: cover;">
+                {% else %}
+                    <img src="{{ url_for('static', filename='img/img-01.jpg') }}" alt="Image" class="img-fluid">                            
+                {% endif %}
+            </div>
+            <h2 class="tm-pt-30 tm-color-primary tm-post-title">{{ post.title }}</h2>
+        </a>                    
+        <p class="tm-pt-30">
+            {{ post.content[:150] }}...
+        </p>
+        <div class="d-flex justify-content-between tm-pt-45">
+            <span class="tm-color-primary">Author: {{ post.author }}</span>
+            <span class="tm-color-primary">{{ post.created_at[:10] }}</span>
+        </div>
+        <hr>
+    </article>
+    {% else %}
+    <div class="col-12"><p>No posts found. Be the first to write one!</p></div>
+    {% endfor %}
+</div>
+{% endblock %}
